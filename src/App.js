@@ -80,15 +80,15 @@ function dkOf(y,mo,d) { return `${y}-${String(mo+1).padStart(2,"0")}-${String(d)
 
 function buildCancelSms(dk, reason, registrations) {
   const names=[...new Set(Object.values(registrations||{}).flat())];
-  return `[전시대 봉사 취소 안내]\n\n📅 ${fmt(dk)} 전시대 봉사가 취소되었습니다.\n\n❌ 취소 사유: ${reason}\n\n참여 신청해 주신 분들께 감사드리며,\n다음 기회에 함께하도록 하겠습니다.\n\n신청자: ${names.join(", ")}`;
+  return `[Cart Witnessing 취소 안내]\n\n📅 ${fmt(dk)} Cart Witnessing 봉사가 취소되었습니다.\n\n❌ 취소 사유: ${reason}\n\n참여 신청해 주신 분들께 감사드리며,\n다음 기회에 함께하도록 하겠습니다.\n\n신청자: ${names.join(", ")}`;
 }
 function buildScheduleSms(dk, locName, slots, startTime, totalHours, sessionLabel) {
-  let txt = `[전시대 봉사 시간표]\n📅 ${fmt(dk)} ${sessionLabel||""}\n📍 ${locName}\n⏰ ${startTime} 시작 (${totalHours}시간)\n\n`;
+  let txt = `[Cart Witnessing 시간표]\n📅 ${fmt(dk)} ${sessionLabel||""}\n📍 ${locName}\n⏰ ${startTime} 시작 (${totalHours}시간)\n\n`;
   slots.forEach(s=>{ txt+=`${s.slotIndex}. ${s.start}~${s.end}  ${s.pair.join(", ")}\n`; });
   return txt + `\n봉사에 참여해 주셔서 감사합니다.`;
 }
 function buildLeaderNoticeSms(dk, locName, regs, startTime, totalHours, leaderName, sessionLabel) {
-  let txt = `[전시대 봉사 안내]\n\n안녕하세요, ${leaderName} 인도자입니다.\n\n`;
+  let txt = `[Cart Witnessing 안내]\n\n안녕하세요, ${leaderName} 인도자입니다.\n\n`;
   txt += `📅 ${fmt(dk)} ${sessionLabel||""}\n📍 ${locName}\n⏰ ${startTime} 시작 (${totalHours}시간)\n\n함께 봉사할 분들:\n`;
   regs.forEach((name, i) => { txt += `  ${i+1}. ${name}\n`; });
   return txt + `\n시간에 맞춰 함께해 주세요. 감사합니다!`;
@@ -463,7 +463,7 @@ export default function App() {
   if(loading) return (
     <div style={{...S.page,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"100vh"}}>
       <div style={{fontSize:56,marginBottom:12}}>📋</div>
-      <h1 style={{fontSize:24,fontWeight:900,color:"#1e3a8a",marginBottom:4}}>전시대 봉사 신청</h1>
+      <h1 style={{fontSize:24,fontWeight:900,color:"#1e3a8a",marginBottom:4}}>Cart Witnessing</h1>
       <Spinner/>
     </div>
   );
@@ -476,8 +476,8 @@ export default function App() {
       <div style={S.loginWrap}>
         <div style={{textAlign:"center",marginBottom:32}}>
           <div style={{fontSize:64,marginBottom:8}}>📋</div>
-          <h1 style={{fontWeight:900,fontSize:28,color:"#1e3a8a",margin:"0 0 4px"}}>전시대 봉사 신청</h1>
-          <p style={{color:"#3b82f6",fontSize:14,margin:0,fontWeight:600}}>Exhibition Booth Volunteer</p>
+          <h1 style={{fontWeight:900,fontSize:28,color:"#1e3a8a",margin:"0 0 4px"}}>Cart Witnessing</h1>
+          <p style={{color:"#3b82f6",fontSize:14,margin:0,fontWeight:600}}>Cart Witnessing Volunteer</p>
         </div>
 
         <div style={S.modeRow}>
@@ -598,8 +598,8 @@ export default function App() {
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <span style={{fontSize:28}}>📋</span>
           <div>
-            <div style={{fontWeight:900,fontSize:17,color:"#1e3a8a"}}>전시대 봉사</div>
-            <div style={{fontSize:11,color:"#3b82f6",fontWeight:600}}>Exhibition Booth</div>
+            <div style={{fontWeight:900,fontSize:17,color:"#1e3a8a"}}>Cart Witnessing</div>
+            <div style={{fontSize:11,color:"#3b82f6",fontWeight:600}}>Cart Witnessing</div>
           </div>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
