@@ -761,12 +761,43 @@ export default function App() {
         {appTab==="detail"&&selectedDate&&(
           <div>
             {/* 날짜/요일 크게 표시 */}
-            {(()=>{const {month:mo,day:d,dayKo,dowIdx}=fmtFull(selectedDate);
+            {(()=>{
+              const {month:mo,day:d,dayKo,dowIdx}=fmtFull(selectedDate);
+              const [y,mn,dd]=selectedDate.split("-").map(Number);
+              const dayNum=new Date(y,mn-1,dd).getDate();
+              const dowNum=new Date(y,mn-1,dd).getDay();
+              const isFirstSatDetail=dowNum===6&&dayNum<=7;
               return (
-                <div style={{textAlign:"center",marginBottom:20,background:"white",borderRadius:16,padding:"20px",border:"2px solid #bfdbfe",boxShadow:"0 2px 8px rgba(37,99,235,0.08)"}}>
-                  <div style={{fontSize:48,fontWeight:900,color:"#1e3a8a",lineHeight:1}}>{d}</div>
-                  <div style={{fontSize:22,fontWeight:800,color:"#2563eb",marginTop:2}}>{mo}월 {dayKo}</div>
-                  {selData?.cancelled&&<div style={{marginTop:8,background:"#fee2e2",borderRadius:20,padding:"4px 16px",fontSize:14,color:"#dc2626",fontWeight:700,display:"inline-block"}}>❌ 취소됨 — {selData.cancelReason}</div>}
+                <div>
+                  <div style={{textAlign:"center",marginBottom:isFirstSatDetail?12:20,background:"white",borderRadius:16,padding:"20px",border:"2px solid #bfdbfe",boxShadow:"0 2px 8px rgba(37,99,235,0.08)"}}>
+                    <div style={{fontSize:48,fontWeight:900,color:"#1e3a8a",lineHeight:1}}>{d}</div>
+                    <div style={{fontSize:22,fontWeight:800,color:"#2563eb",marginTop:2}}>{mo}월 {dayKo}</div>
+                    {isFirstSatDetail&&<div style={{marginTop:8,background:"#f3e8ff",borderRadius:20,padding:"4px 16px",fontSize:15,color:"#7c3aed",fontWeight:800,display:"inline-block"}}>🟣 집단봉사의 날</div>}
+                    {selData?.cancelled&&<div style={{marginTop:8,background:"#fee2e2",borderRadius:20,padding:"4px 16px",fontSize:14,color:"#dc2626",fontWeight:700,display:"inline-block"}}>❌ 취소됨 — {selData.cancelReason}</div>}
+                  </div>
+
+                  {/* 집단봉사 안내 카드 */}
+                  {isFirstSatDetail&&(
+                    <div style={{background:"#f5f3ff",border:"2px solid #c4b5fd",borderRadius:16,padding:20,marginBottom:16,boxShadow:"0 2px 8px rgba(124,58,237,0.08)"}}>
+                      <div style={{fontWeight:900,fontSize:16,color:"#6d28d9",marginBottom:14,display:"flex",alignItems:"center",gap:8}}>
+                        🗺️ 집단별 봉사 장소 안내
+                      </div>
+                      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                        {[
+                          {group:"삼성집단",place:"광산사거리B"},
+                          {group:"중앙집단",place:"광산사거리A"},
+                          {group:"수유집단",place:"우이천"},
+                          {group:"효문집단",place:"덕성여대"},
+                          {group:"쌍문집단",place:"쌍문역"},
+                        ].map(({group,place})=>(
+                          <div key={group} style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:"white",borderRadius:10,padding:"10px 16px",border:"1px solid #ddd6fe"}}>
+                            <span style={{fontWeight:800,fontSize:16,color:"#4c1d95"}}>👥 {group}</span>
+                            <span style={{fontWeight:700,fontSize:16,color:"#7c3aed",background:"#ede9fe",borderRadius:10,padding:"4px 14px"}}>📍 {place}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })()}
