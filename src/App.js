@@ -582,7 +582,7 @@ export default function App() {
 
                 return (
                   <div key={dk}
-                    onClick={()=>{if(active||isAdmin){setSelectedDate(dk);if(active){setSelectedSession(null);setAppTab("detail");}else setAppTab("calendar");}}}
+                    onClick={()=>{if(active||isAdmin){setSelectedDate(dk);setSelectedSession(null);setAppTab("detail");}}}
                     style={{
                       borderRadius:12,padding:"6px 4px",display:"flex",flexDirection:"column",alignItems:"center",
                       background:isSel?"#2563eb":active?"#eff6ff":"white",
