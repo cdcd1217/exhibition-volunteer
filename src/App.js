@@ -149,6 +149,13 @@ export default function App() {
   const [cancelModal,setCancelModal]=useState(null);
   const [cancelReason,setCancelReason]=useState(CANCEL_REASONS[0]);
   const [cancelCustom,setCancelCustom]=useState("");
+
+  // 공지사항: [{id, title, content, pinned, createdAt}]
+  const [notices,setNotices]=useState([]);
+  const [noticeModal,setNoticeModal]=useState(null); // null | {mode:"new"|"edit", notice?}
+  const [noticeTitle,setNoticeTitle]=useState("");
+  const [noticeContent,setNoticeContent]=useState("");
+  const [noticePinned,setNoticePinned]=useState(false);
   const [now,setNow]=useState(new Date());
 
   const daysInMonth=useMemo(()=>new Date(year,month+1,0).getDate(),[year,month]);
@@ -204,6 +211,8 @@ export default function App() {
       if (setRes.data) {
         const locSetting=setRes.data.find(s=>s.key==="location_names");
         if(locSetting?.value) setLocationNames(locSetting.value);
+        const noticeSetting=setRes.data.find(s=>s.key==="notices");
+        if(noticeSetting?.value) setNotices(noticeSetting.value);
       }
     } catch(e){console.error("loadAll error:",e);}
     setLoading(false);
@@ -416,6 +425,28 @@ export default function App() {
     return SESSION_TYPES.filter(t=>sessions[t.id]?.active);
   };
 
+  // ── 공지사항 ──────────────────────────────────────────────────────
+  const saveNotices=async(list)=>{
+    await supabase.from("settings").upsert({key:"notices",value:list});
+    await loadAll();
+  };
+  const addNotice=async()=>{
+    if(!noticeTitle.trim())return;
+    const newN={id:Date.now().toString(),title:noticeTitle.trim(),content:noticeContent.trim(),pinned:noticePinned,createdAt:new Date().toISOString()};
+    await saveNotices([newN,...notices]);
+    setNoticeModal(null);setNoticeTitle("");setNoticeContent("");setNoticePinned(false);
+  };
+  const updateNotice=async(id)=>{
+    if(!noticeTitle.trim())return;
+    await saveNotices(notices.map(n=>n.id===id?{...n,title:noticeTitle.trim(),content:noticeContent.trim(),pinned:noticePinned}:n));
+    setNoticeModal(null);setNoticeTitle("");setNoticeContent("");setNoticePinned(false);
+  };
+  const deleteNotice=async(id)=>{
+    if(!window.confirm("공지사항을 삭제할까요?"))return;
+    await saveNotices(notices.filter(n=>n.id!==id));
+  };
+  const sortedNotices=[...notices.filter(n=>n.pinned),...notices.filter(n=>!n.pinned)];
+
   if(loading) return (
     <div style={{...S.page,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"100vh"}}>
       <div style={{fontSize:56,marginBottom:12}}>📋</div>
@@ -502,7 +533,30 @@ export default function App() {
         </div>
       )}
 
-      {/* 취소 모달 */}
+      {/* 공지사항 작성/수정 모달 */}
+      {noticeModal&&(
+        <div style={S.overlay}>
+          <div style={S.modal}>
+            <div style={{fontWeight:800,fontSize:17,marginBottom:16,color:"#1e3a8a"}}>
+              {noticeModal.mode==="new"?"📢 공지사항 작성":"📢 공지사항 수정"}
+            </div>
+            <label style={{...S.label,marginBottom:6}}>제목</label>
+            <input style={{...S.input,marginBottom:12}} placeholder="공지사항 제목" value={noticeTitle} onChange={e=>setNoticeTitle(e.target.value)}/>
+            <label style={{...S.label,marginBottom:6}}>내용</label>
+            <textarea style={{...S.textarea,height:140,marginBottom:12}} placeholder="공지사항 내용을 입력하세요" value={noticeContent} onChange={e=>setNoticeContent(e.target.value)}/>
+            <label style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",marginBottom:16,fontSize:14,fontWeight:600,color:"#374151"}}>
+              <input type="checkbox" checked={noticePinned} onChange={e=>setNoticePinned(e.target.checked)} style={{width:16,height:16}}/>
+              📌 상단 고정 (중요 공지)
+            </label>
+            <div style={{display:"flex",gap:8}}>
+              <button onClick={()=>{setNoticeModal(null);setNoticeTitle("");setNoticeContent("");setNoticePinned(false);}} style={{...S.ghostBtn,flex:1,padding:"10px"}}>취소</button>
+              <button onClick={()=>noticeModal.mode==="new"?addNotice():updateNotice(noticeModal.notice.id)} style={{...S.primaryBtn,flex:2,padding:"10px"}}>
+                {noticeModal.mode==="new"?"등록":"수정"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {cancelModal&&(
         <div style={S.overlay}>
           <div style={S.modal}>
@@ -560,6 +614,55 @@ export default function App() {
         {/* ══════════ 달력 ══════════════════════════════════════════ */}
         {appTab==="calendar"&&(
           <div>
+
+            {/* 공지사항 섹션 */}
+            <div style={{marginBottom:20}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+                <div style={{fontWeight:800,fontSize:16,color:"#1e3a8a",display:"flex",alignItems:"center",gap:6}}>
+                  📢 공지사항
+                </div>
+                {isAdmin&&(
+                  <button onClick={()=>{setNoticeModal({mode:"new"});setNoticeTitle("");setNoticeContent("");setNoticePinned(false);}}
+                    style={{...S.primaryBtn,fontSize:12,padding:"6px 14px"}}>
+                    + 공지 작성
+                  </button>
+                )}
+              </div>
+              {sortedNotices.length===0?(
+                <div style={{background:"white",borderRadius:12,padding:"16px",border:"1px solid #e5e7eb",textAlign:"center",color:"#9ca3af",fontSize:14}}>
+                  등록된 공지사항이 없습니다.
+                </div>
+              ):(
+                <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                  {sortedNotices.map(n=>(
+                    <div key={n.id} style={{background:n.pinned?"#fffbeb":"white",border:`1.5px solid ${n.pinned?"#fde68a":"#e5e7eb"}`,borderRadius:12,padding:"14px 16px",boxShadow:"0 1px 4px rgba(0,0,0,0.04)"}}>
+                      <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
+                        <div style={{flex:1}}>
+                          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+                            {n.pinned&&<span style={{fontSize:14}}>📌</span>}
+                            <span style={{fontWeight:800,fontSize:15,color:"#1e3a8a"}}>{n.title}</span>
+                          </div>
+                          {n.content&&(
+                            <div style={{fontSize:14,color:"#374151",lineHeight:1.6,whiteSpace:"pre-wrap"}}>{n.content}</div>
+                          )}
+                          <div style={{fontSize:11,color:"#9ca3af",marginTop:6}}>
+                            {new Date(n.createdAt).toLocaleDateString("ko-KR",{month:"long",day:"numeric"})}
+                          </div>
+                        </div>
+                        {isAdmin&&(
+                          <div style={{display:"flex",gap:4,flexShrink:0}}>
+                            <button onClick={()=>{setNoticeModal({mode:"edit",notice:n});setNoticeTitle(n.title);setNoticeContent(n.content);setNoticePinned(n.pinned);}}
+                              style={{background:"transparent",border:"1px solid #cbd5e1",borderRadius:6,color:"#6b7280",padding:"3px 8px",fontSize:12,cursor:"pointer"}}>✏️</button>
+                            <button onClick={()=>deleteNotice(n.id)}
+                              style={{background:"transparent",border:"1px solid #fca5a5",borderRadius:6,color:"#ef4444",padding:"3px 8px",fontSize:12,cursor:"pointer"}}>🗑</button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
               <button style={S.arrowBtn} onClick={()=>{if(month===0){setMonth(11);setYear(y=>y-1);}else setMonth(m=>m-1);}}>‹</button>
               <span style={{fontWeight:900,fontSize:22,color:"#1e3a8a"}}>{year}년 {MON_KO[month]}</span>
