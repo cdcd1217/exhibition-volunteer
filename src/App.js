@@ -697,7 +697,7 @@ export default function App() {
                     }}>
                     <span style={{fontSize:15,fontWeight:isToday?900:600,color:isSel?"white":cancelled?"#ef4444":holiday?"#f59e0b":dow===0?"#ef4444":dow===6?"#2563eb":"#1f2937"}}>{day}</span>
                     {holiday&&!cancelled&&<div style={{fontSize:7,color:"#f59e0b",maxWidth:"90%",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",lineHeight:1,marginTop:1}}>{holiday}</div>}
-                    {isFirstSat&&!holiday&&<div style={{fontSize:7,color:"#7c3aed",fontWeight:800,lineHeight:1,marginTop:1,whiteSpace:"nowrap"}}>집단봉사</div>}
+                    {isFirstSat&&<div style={{fontSize:7,color:"#7c3aed",fontWeight:800,lineHeight:1,marginTop:1,whiteSpace:"nowrap"}}>집단봉사</div>}
                     {cancelled&&<div style={{fontSize:9,color:"#ef4444",fontWeight:800}}>취소</div>}
                     {/* 세션 표시 */}
                     {!cancelled&&active&&(
