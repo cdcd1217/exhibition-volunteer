@@ -320,11 +320,24 @@ export default function App() {
   };
 
   // ── 신청 ────────────────────────────────────────────────────────────
+  // 같은 세션에서 이미 신청한 전시대 찾기
+  const myLocInSession=(dk,sessionId)=>{
+    if(!currentUser)return null;
+    const sessRegs=registrations[dk]?.[sessionId]||{};
+    for(const [locIdx,names] of Object.entries(sessRegs)){
+      if(names.includes(currentUser.name)) return Number(locIdx);
+    }
+    return null;
+  };
+
   const register=async(dk,sessionId,locIdx)=>{
     if(isDeadlinePassed(dk,sessionId))return;
     const name=currentUser.name;
     const regs=(registrations[dk]?.[sessionId]?.[locIdx]||[]);
     if(regs.includes(name)||regs.length>=8)return;
+    // 같은 세션에 이미 다른 전시대 신청한 경우 차단
+    const alreadyLoc=myLocInSession(dk,sessionId);
+    if(alreadyLoc!==null&&alreadyLoc!==locIdx)return;
     await supabase.from("registrations").insert({date_key:dk,loc_idx:locIdx,member_name:name,session_id:sessionId});
     await loadAll();
   };
@@ -832,8 +845,10 @@ export default function App() {
                       const locLeader=sessData?.leaders?.[locIdx];
                       const locLeaderMem=locLeader?members.find(m=>m.name===locLeader):null;
                       const hasBro=hasBrother(selectedDate,selectedSession,locIdx);
+                      const myLocAlready=myLocInSession(selectedDate,selectedSession);
+                      const alreadyOtherLoc=myLocAlready!==null&&myLocAlready!==locIdx;
                       return (
-                        <div key={locIdx} style={{background:"white",border:`2px solid ${hasBro?"#bfdbfe":"#fde68a"}`,borderRadius:16,padding:20,marginBottom:14,boxShadow:"0 2px 8px rgba(37,99,235,0.06)"}}>
+                        <div key={locIdx} style={{background:"white",border:`2px solid ${hasBro?"#bfdbfe":"#fde68a"}`,borderRadius:16,padding:20,marginBottom:14,boxShadow:"0 2px 8px rgba(37,99,235,0.06)",opacity:alreadyOtherLoc?0.5:1}}>
                           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10,flexWrap:"wrap",gap:8}}>
                             <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
                               <span style={{fontWeight:900,fontSize:20,color:"#1e3a8a"}}>📍 {locationNames[locIdx]}</span>
@@ -846,9 +861,11 @@ export default function App() {
                               ?<span style={{fontSize:14,color:"#9ca3af",fontWeight:600}}>신청 마감</span>
                               :myReg
                                 ?<button onClick={()=>unregister(selectedDate,selectedSession,locIdx)} style={{background:"#fee2e2",border:"1.5px solid #fca5a5",borderRadius:10,color:"#dc2626",padding:"10px 18px",fontWeight:800,fontSize:15,cursor:"pointer"}}>취소</button>
-                                :<button onClick={()=>register(selectedDate,selectedSession,locIdx)} disabled={isFull} style={{...S.primaryBtn,opacity:isFull?0.4:1,fontSize:15,padding:"10px 20px"}}>
-                                  {isFull?"마감":"신청하기"}
-                                </button>
+                                :alreadyOtherLoc
+                                  ?<span style={{fontSize:13,color:"#9ca3af",fontWeight:600}}>다른 곳 신청됨</span>
+                                  :<button onClick={()=>register(selectedDate,selectedSession,locIdx)} disabled={isFull} style={{...S.primaryBtn,opacity:isFull?0.4:1,fontSize:15,padding:"10px 20px"}}>
+                                    {isFull?"마감":"신청하기"}
+                                  </button>
                             )}
                           </div>
 
