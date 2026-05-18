@@ -683,8 +683,6 @@ export default function App() {
                 const hasMorning=activeSessions.some(s=>s.id==="morning");
                 const hasEvening=activeSessions.some(s=>s.id==="evening");
                 const isFirstSat=dow===6&&day<=7;
-                // 매월 첫 번째 토요일 판별
-                const isFirstSat=dow===6&&day<=7;
 
                 return (
                   <div key={dk}
