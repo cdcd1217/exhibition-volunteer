@@ -641,7 +641,16 @@ export default function App() {
             {/* 세션 없으면 선택 먼저 */}
             {!selectedSession&&selData?.active&&!selData?.cancelled&&(()=>{
               const activeSessions=getActiveSessions(selectedDate);
-              if(activeSessions.length===0) return <div style={{textAlign:"center",color:"#6b7280",padding:"32px 0",fontSize:16}}>활성화된 세션이 없습니다.<br/>{isAdmin&&"관리자 설정에서 오전/오후 세션을 활성화하세요."}</div>;
+              if(activeSessions.length===0) return (
+                <div>
+                  <div style={{textAlign:"center",color:"#6b7280",padding:"24px 0",fontSize:16}}>
+                    활성화된 세션이 없습니다.
+                  </div>
+                  {isAdmin&&(
+                    <AdminDateSettings dk={selectedDate} selData={selData} getDateSessions={getDateSessions} toggleSession={toggleSession} updateSessionField={updateSessionField} toggleLocation={toggleLocation} locationNames={locationNames} setCancelModal={setCancelModal} deleteDateFully={deleteDateFully} toggleDateActive={toggleDateActive} setAppTab={setAppTab}/>
+                  )}
+                </div>
+              );
               return (
                 <div>
                   <div style={{textAlign:"center",fontSize:18,fontWeight:800,color:"#1e3a8a",marginBottom:16}}>참여할 봉사를 선택하세요</div>
@@ -791,7 +800,13 @@ export default function App() {
               </div>
             )}
 
-            {!selData?.active&&(
+            {!selData?.active&&isAdmin&&(
+              <div>
+                <div style={{textAlign:"center",color:"#6b7280",padding:"16px 0",fontSize:15}}>날짜를 활성화하고 세션을 설정하세요.</div>
+                <AdminDateSettings dk={selectedDate} selData={selData||{activeLocations:[true,false,false,false,false]}} getDateSessions={getDateSessions} toggleSession={toggleSession} updateSessionField={updateSessionField} toggleLocation={toggleLocation} locationNames={locationNames} setCancelModal={setCancelModal} deleteDateFully={deleteDateFully} toggleDateActive={toggleDateActive} setAppTab={setAppTab}/>
+              </div>
+            )}
+            {!selData?.active&&!isAdmin&&(
               <div style={{textAlign:"center",color:"#6b7280",padding:"32px 0",fontSize:16}}>봉사 일정이 없습니다.</div>
             )}
           </div>
