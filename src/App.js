@@ -682,6 +682,9 @@ export default function App() {
                 const mySessions=mySessionsOnDate(dk);
                 const hasMorning=activeSessions.some(s=>s.id==="morning");
                 const hasEvening=activeSessions.some(s=>s.id==="evening");
+                const isFirstSat=dow===6&&day<=7;
+                // 매월 첫 번째 토요일 판별
+                const isFirstSat=dow===6&&day<=7;
 
                 return (
                   <div key={dk}
@@ -696,6 +699,7 @@ export default function App() {
                     }}>
                     <span style={{fontSize:15,fontWeight:isToday?900:600,color:isSel?"white":cancelled?"#ef4444":holiday?"#f59e0b":dow===0?"#ef4444":dow===6?"#2563eb":"#1f2937"}}>{day}</span>
                     {holiday&&!cancelled&&<div style={{fontSize:7,color:"#f59e0b",maxWidth:"90%",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",lineHeight:1,marginTop:1}}>{holiday}</div>}
+                    {isFirstSat&&!holiday&&<div style={{fontSize:7,color:"#7c3aed",fontWeight:800,lineHeight:1,marginTop:1,whiteSpace:"nowrap"}}>집단봉사</div>}
                     {cancelled&&<div style={{fontSize:9,color:"#ef4444",fontWeight:800}}>취소</div>}
                     {/* 세션 표시 */}
                     {!cancelled&&active&&(
@@ -734,7 +738,7 @@ export default function App() {
               <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#374151"}}><div style={{width:12,height:12,borderRadius:3,background:"#eff6ff",border:"1.5px solid #93c5fd"}}/>봉사 날짜</div>
               <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#374151"}}><div style={{width:10,height:10,borderRadius:"50%",background:"#fde68a",border:"1.5px solid #f59e0b"}}/>🌅 오전</div>
               <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#374151"}}><div style={{width:10,height:10,borderRadius:"50%",background:"#c7d2fe",border:"1.5px solid #6366f1"}}/>🌆 오후/저녁</div>
-              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#374151"}}><div style={{width:12,height:12,borderRadius:"50%",background:"#16a34a",border:"2px solid #15803d",boxShadow:"0 0 4px rgba(22,163,74,0.5)"}}/>내가 신청한 세션</div>
+              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#374151"}}><div style={{width:12,height:12,borderRadius:"50%",background:"#16a34a",border:"2px solid #15803d",boxShadow:"0 0 4px rgba(22,163,74,0.5)"}}/>내가 신청한 날</div>
               <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#374151"}}><div style={{width:10,height:10,borderRadius:"50%",background:"#fca5a5",border:"1.5px solid #ef4444"}}/>취소</div>
             </div>
 
