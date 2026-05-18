@@ -699,9 +699,23 @@ export default function App() {
                     {cancelled&&<div style={{fontSize:9,color:"#ef4444",fontWeight:800}}>취소</div>}
                     {/* 세션 표시 */}
                     {!cancelled&&active&&(
-                      <div style={{display:"flex",gap:2,marginTop:3,flexWrap:"wrap",justifyContent:"center"}}>
-                        {hasMorning&&<div style={{width:8,height:8,borderRadius:"50%",background:mySessions.includes("morning")?"#f59e0b":"#fde68a",border:"1.5px solid #f59e0b"}}/>}
-                        {hasEvening&&<div style={{width:8,height:8,borderRadius:"50%",background:mySessions.includes("evening")?"#6366f1":"#c7d2fe",border:"1.5px solid #6366f1"}}/>}
+                      <div style={{display:"flex",gap:3,marginTop:3,flexWrap:"wrap",justifyContent:"center"}}>
+                        {hasMorning&&<div style={{
+                          width:mySessions.includes("morning")?10:7,
+                          height:mySessions.includes("morning")?10:7,
+                          borderRadius:"50%",
+                          background:mySessions.includes("morning")?"#16a34a":"#fde68a",
+                          border:`2px solid ${mySessions.includes("morning")?"#15803d":"#f59e0b"}`,
+                          boxShadow:mySessions.includes("morning")?"0 0 4px rgba(22,163,74,0.6)":"none",
+                        }}/>}
+                        {hasEvening&&<div style={{
+                          width:mySessions.includes("evening")?10:7,
+                          height:mySessions.includes("evening")?10:7,
+                          borderRadius:"50%",
+                          background:mySessions.includes("evening")?"#16a34a":"#c7d2fe",
+                          border:`2px solid ${mySessions.includes("evening")?"#15803d":"#6366f1"}`,
+                          boxShadow:mySessions.includes("evening")?"0 0 4px rgba(22,163,74,0.6)":"none",
+                        }}/>}
                       </div>
                     )}
                     {isAdmin&&!cancelled&&(
@@ -718,8 +732,9 @@ export default function App() {
             {/* 범례 */}
             <div style={{display:"flex",gap:14,marginTop:14,flexWrap:"wrap",padding:"12px 0"}}>
               <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#374151"}}><div style={{width:12,height:12,borderRadius:3,background:"#eff6ff",border:"1.5px solid #93c5fd"}}/>봉사 날짜</div>
-              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#374151"}}><div style={{width:10,height:10,borderRadius:"50%",background:"#f59e0b",border:"1.5px solid #f59e0b"}}/>🌅 오전</div>
-              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#374151"}}><div style={{width:10,height:10,borderRadius:"50%",background:"#6366f1",border:"1.5px solid #6366f1"}}/>🌆 오후/저녁</div>
+              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#374151"}}><div style={{width:10,height:10,borderRadius:"50%",background:"#fde68a",border:"1.5px solid #f59e0b"}}/>🌅 오전</div>
+              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#374151"}}><div style={{width:10,height:10,borderRadius:"50%",background:"#c7d2fe",border:"1.5px solid #6366f1"}}/>🌆 오후/저녁</div>
+              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#374151"}}><div style={{width:12,height:12,borderRadius:"50%",background:"#16a34a",border:"2px solid #15803d",boxShadow:"0 0 4px rgba(22,163,74,0.5)"}}/>내가 신청한 세션</div>
               <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#374151"}}><div style={{width:10,height:10,borderRadius:"50%",background:"#fca5a5",border:"1.5px solid #ef4444"}}/>취소</div>
             </div>
 
